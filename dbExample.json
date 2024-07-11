@@ -1,0 +1,26 @@
+{
+    "status": {
+        "code": 200,
+        "description": "Ok"
+    },
+    
+    "data": [
+        {
+            "id": "58e0c367-af5e-4b9e-ae56-75f3b53a0096",
+            "name": "Cuci + Setrika",
+            "price": 11000,
+            "type": "Kg",
+            "createdAt": "2024-07-10T19:18:51.4301821+07:00",
+            "updatedAt": "2024-07-10T19:18:51.4301821+07:00"
+        },
+        {
+            "id": "e2f7be9c-0b63-4064-bf53-6830b40fd63b",
+            "name": "Cuci",
+            "price": 7000,
+            "type": "Kg",
+            "createdAt": "2024-07-10T19:18:51.4301821+07:00",
+            "updatedAt": "2024-07-10T19:18:51.4301821+07:00"
+        }
+    ],
+    "paging": null
+}
