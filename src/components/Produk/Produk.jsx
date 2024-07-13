@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Card, CardHeader, CardBody, CardFooter, Input } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Card, CardHeader, CardBody, CardFooter, Input, Modal } from "@nextui-org/react";
 import { axiosIntance } from "../../lib/axios";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
+import EditProduk from "./EditProduk";
 
 export default function Produk() {
 
@@ -15,8 +16,9 @@ export default function Produk() {
         "price": 0,
         "type": ""
     })
-    const [openTable, setOpenTable] = useState(false)
+    const [modalUpdate, setModalUpdate] = useState(false)
     const [create, setCreate] = useState(false)
+    const [selectedProduk, setSelectedProduk] = useState(null)
 
     const fetchProduk = async () => {
         try {
@@ -82,9 +84,12 @@ export default function Produk() {
         }
     }
 
-    const close = () => {
-        setOpenTable(false)
+    const openModalUpdate = (produk) => {
+        setModalUpdate(true)
+        setSelectedProduk(produk)
     }
+
+
 
     const addProduk = () => {
         setCreate(true)
@@ -122,24 +127,6 @@ export default function Produk() {
                         </div>
                     </div>
                 )}
-                {openTable && (
-                    <div className="h-screen fixed w-[300px] bg-mute z-20">
-                        <div className="flex justify-center items-center h-full">
-                            <Card className="bg-white">
-                                <CardHeader className="justify-center">
-                                    <h1>Hello World!</h1>
-                                </CardHeader>
-                                <CardBody>
-                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam odio excepturi ex reprehenderit in maiores ratione suscipit sint, impedit incidunt.</p>
-                                </CardBody>
-                                <CardFooter className="justify-end gap-2">
-                                    <Button color="danger" variant="ghost" onClick={close}>Close</Button>
-                                    <Button color="success" variant="ghost">Save</Button>
-                                </CardFooter>
-                            </Card>
-                        </div>
-                    </div>
-                )}
                 <div className="flex gap-[41rem]">
                     <h1>List Produk</h1>
                     <Button onClick={addProduk} color="primary" variant="bordered">Create</Button>
@@ -163,13 +150,20 @@ export default function Produk() {
                                     <TableCell>{data.price}</TableCell>
                                     <TableCell>{data.type}</TableCell>
                                     <TableCell>
-                                        <Button color="primary" variant="bordered" onClick={""}>edit</Button>
+                                        <Button color="primary" variant="bordered" onClick={() => openModalUpdate(data)}>edit</Button>
                                         <Button color="warning" variant="bordered" onClick={() => deleteProduk(data.id)}>hapus</Button>
                                     </TableCell>
                                 </TableRow>)
                         })}
                     </TableBody>
                 </Table>
+                <Modal
+                    isOpen={modalUpdate}
+                    onOpenChange={() => setModalUpdate(false)}
+                    onClose={() => setModalUpdate(false)}
+                >
+                    <EditProduk produk={selectedProduk} handleFetchProduk={fetchProduk} />
+                </Modal>
             </div>
         </>
     );

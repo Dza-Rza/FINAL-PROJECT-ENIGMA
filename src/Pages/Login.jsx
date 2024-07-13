@@ -5,7 +5,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { axiosIntance } from "../lib/axios"
 import { toast } from "sonner"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { jwtDecode } from "jwt-decode"
 import { useDispatch } from "react-redux"
 
@@ -80,7 +80,7 @@ export default function LoginUser() {
                                 return <Input {...field} type="password" label="Password" size="sm" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} />
                             }}
                         />
-                        <p></p>
+                        <p>Don't Have Account <Link to="/register-user"color="primary" >Register</Link></p>
                         <Button type="submit" color="primary">Register</Button>
                     </form>
                 </CardBody>

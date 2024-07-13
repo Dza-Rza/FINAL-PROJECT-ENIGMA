@@ -134,7 +134,7 @@ export default function Register() {
                                 return <Input {...field} type="password" label="Password" size="sm" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} />
                             }}
                         />
-                        <p>Already Have An Account <Link to="Login" /> </p>
+                        <p className="gap-4">Already Have An Account <Link to="/Login" >Login</Link> </p>
                         <Button type="submit" color="primary">Register</Button>
                     </form>
                 </CardBody>

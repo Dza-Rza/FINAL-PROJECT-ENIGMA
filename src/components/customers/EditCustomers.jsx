@@ -19,6 +19,7 @@ export default function EditCustomers({ customer, handleFetchData }) {
     useEffect(() => {
         if (customer) {
             reset({
+                id: customer.id,
                 name: customer.name,
                 phoneNumber: customer.phoneNumber,
                 address: customer.address,
@@ -36,8 +37,8 @@ export default function EditCustomers({ customer, handleFetchData }) {
                         Authorization: `Bearer ${token}`
                     }
                 }
-            ) 
-            if (res.data.status.code === 200){
+            )
+            if (res.data.status.code === 200) {
                 toast.success("success")
                 handleFetchData()
             }
