@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button, Card, CardHeader, CardBody, CardFooter, Input } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Card, CardHeader, CardBody, CardFooter, Input } from "@nextui-org/react";
 import { axiosIntance } from "../../lib/axios";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
@@ -10,6 +10,7 @@ export default function Produk() {
 
     const [dataProduk, setDataProduk] = useState([])
     const [createProduk, setCreateProduk] = useState({
+        "id": "",
         "name": "",
         "price": 0,
         "type": ""
@@ -20,7 +21,7 @@ export default function Produk() {
     const fetchProduk = async () => {
         try {
 
-            console.log(tokenApps)
+            // console.log(tokenApps)
             const { data: produkdata } = await axiosIntance.get(
                 "/products",
                 { headers: { Authorization: `Bearer ${tokenApps}` } }
@@ -42,8 +43,9 @@ export default function Produk() {
     }, [createProduk])
 
     const handleValueCreate = (typeData, value) => {
-        // setCreateProduk(prevalue => ({ ...prevalue, type: value }))
-        if (typeData === "namaproduk") {
+        if (typeData === "id") {
+            setCreateProduk(prevalue => ({ ...prevalue, id: value }))
+        } else if (typeData === "namaproduk") {
             setCreateProduk(prevalue => ({ ...prevalue, name: value }))
         } else if (typeData === "priceproduk") {
             setCreateProduk(prevalue => ({ ...prevalue, price: + value }))
@@ -51,7 +53,23 @@ export default function Produk() {
             setCreateProduk(prevalue => ({ ...prevalue, type: value }))
         }
 
-        console.log(createProduk)
+        // console.log(createProduk)
+    }
+
+    const deleteProduk = async (id) => {
+        try {
+            const headers = {
+                Authorization: `Bearer ${tokenApps}`,
+            };
+            const result = await axiosIntance.delete(`/products/${id}`, { headers });
+            if (result.status === 204) {
+                toast.success("success")
+                fetchProduk()
+            }
+        } catch (error) {
+            console.log(error.message);
+            toast.error("error")
+        }
     }
 
     const addProdukData = async () => {
@@ -62,14 +80,6 @@ export default function Produk() {
         } catch (error) {
             console.log(error)
         }
-    }
-
-    const postProduk = () => {
-        fetchProduk
-    }
-
-    const open = () => {
-        setOpenTable(true)
     }
 
     const close = () => {
@@ -90,7 +100,7 @@ export default function Produk() {
                     <div className="h-screen fixed w-[85%] bg-mute z-20">
                         <div className="flex justify-center items-center h-full">
                             <Card className="w-[300px] border-1 p-2 bg-white">
-                                <CardBody className="gap-2">
+                                <CardBody onSubmit={addProdukData}>
                                     <h1>Nama</h1>
                                     <Input value={createProduk.name} onChange={(e) => {
                                         handleValueCreate("namaproduk", e.target.value)
@@ -103,9 +113,9 @@ export default function Produk() {
                                     <Input value={createProduk.type} onChange={(e) => {
                                         handleValueCreate("typeproduk", e.target.value)
                                     }} />
-                                    <CardFooter className="flex justify-end gap-2">
+                                    <CardFooter className="justify-end">
                                         <Button color="danger" variant="ghost" onClick={CloseAddProduk}>Close</Button>
-                                        <Button color="success" variant="ghost" onClick={addProdukData}>Create</Button>
+                                        <Button type="submit" color="success" variant="ghost" onClick={addProdukData}>Create</Button>
                                     </CardFooter>
                                 </CardBody>
                             </Card>
@@ -131,7 +141,7 @@ export default function Produk() {
                     </div>
                 )}
                 <div className="flex gap-[41rem]">
-                    <h1>List Customer</h1>
+                    <h1>List Produk</h1>
                     <Button onClick={addProduk} color="primary" variant="bordered">Create</Button>
                 </div>
                 <Table
@@ -142,6 +152,7 @@ export default function Produk() {
                         <TableColumn>NAME</TableColumn>
                         <TableColumn>PRICE</TableColumn>
                         <TableColumn>TYPE</TableColumn>
+                        <TableColumn>EDIT</TableColumn>
                     </TableHeader>
                     <TableBody>
                         {dataProduk.map((data) => {
@@ -149,20 +160,16 @@ export default function Produk() {
                                 <TableRow key={"produk" + data.id}>
                                     <TableCell>{data.id}</TableCell>
                                     <TableCell>{data.name}</TableCell>
+                                    <TableCell>{data.price}</TableCell>
                                     <TableCell>{data.type}</TableCell>
                                     <TableCell>
-                                        <Button color="warning" variant="bordered" onClick={open}>...</Button>
+                                        <Button color="primary" variant="bordered" onClick={""}>edit</Button>
+                                        <Button color="warning" variant="bordered" onClick={() => deleteProduk(data.id)}>hapus</Button>
                                     </TableCell>
                                 </TableRow>)
                         })}
                     </TableBody>
                 </Table>
-            </div>
-            <div className="flex justify-center items-center">
-
-            </div>
-            <div>
-
             </div>
         </>
     );

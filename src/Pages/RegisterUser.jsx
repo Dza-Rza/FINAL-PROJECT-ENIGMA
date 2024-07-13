@@ -56,7 +56,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { axiosIntance } from "../lib/axios"
 import { toast } from "sonner"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const signUpFormSchema = z.object({
     email: z.string().email(),
@@ -134,6 +134,7 @@ export default function Register() {
                                 return <Input {...field} type="password" label="Password" size="sm" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} />
                             }}
                         />
+                        <p>Already Have An Account <Link to="Login" /> </p>
                         <Button type="submit" color="primary">Register</Button>
                     </form>
                 </CardBody>
