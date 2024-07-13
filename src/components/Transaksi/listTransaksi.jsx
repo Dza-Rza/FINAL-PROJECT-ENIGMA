@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardBody, Divider, Button, Input, Select, SelectItem } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Divider, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableRow, TableCell, TableBody, select, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -11,11 +11,97 @@ const transaksiFormSchema = z.object({
     Qty: z.coerce.number().min(1, "Qty tidak boleh kosong")
 })
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { axiosIntance } from "../../lib/axios";
+import { useSelector } from "react-redux";
 
 export default function ListTransactions() {
 
+
+    const token = useSelector(state => state.auth.token)
+    const [dataTranskasi, setDataTransaksi] = useState([])
+    const [dataCustomer, setDataCustomer] = useState([])
+    const [dataProduk, setDataProduk] = useState([])
     const [openModal, setOpenModal] = useState(false)
+    const animals = [{
+        label: "aaaa",
+    },
+    {
+        label: "aaaa",
+    },
+    {
+        label: "aaaa",
+    }]
+    const formInput = useForm({
+        defaultValues: {
+            kodeTransaksi: "",
+            namaKonsumen: "",
+            paketLaundry: "",
+            Qty: ""
+        },
+        resolver: zodResolver(transaksiFormSchema)
+    })
+
+    const getTransksi = async () => {
+        try {
+            const res = await axiosIntance.get("/bills",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+            if (res.data.status.code === 200) {
+                setDataTransaksi(res.data.data)
+            }
+        } catch (error) {
+            console.log(error.message);
+            toast.error("error")
+        }
+    }
+
+    const fetchCustomers = async () => {
+        try {
+
+            // console.log(AuthCustomers)
+            const { data: customerData } = await axiosIntance.get(
+                `/customers`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            )
+            setDataCustomer(customerData.data)
+        } catch (error) {
+            console.log(error)
+            toast.error("error")
+        }
+    }
+
+    const getProduk = async () => {
+        try {
+            const res = await axiosIntance.get("/products/",
+                {
+                    headers:
+                        { Authorization: `Bearer ${token}` }
+                }
+            )
+            // console.log(res.data.data)
+            if (res.data.status.code == 200) {
+                setDataProduk(res.data.data)
+            }
+        } catch (error) {
+            console.log(error.message);
+            toast.error("error")
+        }
+    }
+
+    useEffect(() => {
+        getTransksi()
+        getProduk()
+        fetchCustomers()
+    }, [])
+
+    useEffect(() => {
+        console.log(dataTranskasi)
+    }, [dataTranskasi])
 
     const openSubmit = () => {
         setOpenModal(true)
@@ -25,21 +111,6 @@ export default function ListTransactions() {
         setOpenModal(false)
     }
 
-    const optionPaketLaundry = [
-        { key: "Standard", label: "Standard" },
-        { key: "Premium", label: "Premium" },
-        { key: "Express", label: "Express" }
-    ]
-
-    const formInput = useForm({
-        defaultValues: {
-            kodeTransaksi: "",
-            namaKonsumen: "",
-            paketLaundry: optionPaketLaundry,
-            Qty: ""
-        },
-        resolver: zodResolver(transaksiFormSchema)
-    })
 
     const onSubmit = (data) => {
         try {
@@ -62,14 +133,33 @@ export default function ListTransactions() {
                 </CardHeader>
                 <Divider />
                 <CardBody>
-                    <div className="text-center font-sans flex justify-between">
-                        <h1>kode pelanggan</h1>
-                        <h1>nama pelanggan</h1>
-                        <h1>riwayat transkasi</h1>
-                    </div>
+                    <Table aria-label="Example static collection table">
+                        <TableHeader>
+                            <TableColumn>#</TableColumn>
+                            <TableColumn>Kode Pelanggan</TableColumn>
+                            <TableColumn>Nama Pelanggan</TableColumn>
+                            <TableColumn>Label Transaksi</TableColumn>
+                        </TableHeader>
+                        <TableBody>
+                            {
+                                dataCustomer.map((customer, index) => (
+                                    <TableRow key={index + 1} className="text-center">
+                                        <TableCell>{index + 1}</TableCell>
+                                        <TableCell>{customer.id}</TableCell>
+                                        <TableCell>{customer.name}</TableCell>
+                                        <TableCell>
+                                            <Button>
+                                                Details
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+                        </TableBody>
+                    </Table>
                 </CardBody>
             </Card>
-            <div className="h-screen justify-center items-center">
+            <div className="flex justify-center items-center">
                 {openModal && (
                     <Card className="border-1 p-2 w-[300px] bg-slate-100">
                         <CardHeader className="font-semibold justify-between py-2">
@@ -78,27 +168,29 @@ export default function ListTransactions() {
                         <Divider />
                         <CardBody>
                             <form onSubmit={formInput.handleSubmit(onSubmit)} className="flex flex-col gap-2">
-                                <h1>Kode Transakasi</h1>
-                                <Controller
-                                    name="kodeTransaksi"
-                                    control={formInput.control}
-                                    render={({ field, fieldState }) => { return <Input {...field} variant="bordered" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} /> }}
-                                />
                                 <h1>Nama Konsumen</h1>
                                 <Controller
                                     name="namaKonsumen"
                                     control={formInput.control}
-                                    render={({ field, fieldState }) => { return <Input {...field} variant="bordered" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} /> }}
+                                    render={({ field, fieldState }) => {
+                                        return <Select {...field} variant="bordered" placeholder="Nama Customers" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} >
+                                            {dataCustomer.map((customer) => (
+                                                <SelectItem variant="bordered" color="primary" className="bg-slate-100 text-center" key={customer.id}>
+                                                    {customer.name}
+                                                </SelectItem>
+                                            ))}
+                                        </Select>
+                                    }}
                                 />
                                 <h1>Pilih paket Laundry</h1>
                                 <Controller
                                     name="paketLaundry"
                                     control={formInput.control}
                                     render={({ field, fieldState }) => {
-                                        return <Select {...field} placeholder="pilih-paket" variant="bordered" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} >
-                                            {optionPaketLaundry.map((option) => (
-                                                <SelectItem className="bg-slate-100 text-center" key={option.key} value={option.key}>
-                                                    {option.label}
+                                        return <Select {...field} variant="bordered" placeholder="Paket Laundry" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} >
+                                            {dataProduk.map((produk) => (
+                                                <SelectItem variant="bordered" color="primary" className="bg-slate-100 text-center" key={produk.id}>
+                                                    {produk.name}
                                                 </SelectItem>
                                             ))}
                                         </Select>
@@ -110,8 +202,6 @@ export default function ListTransactions() {
                                     control={formInput.control}
                                     render={({ field, fieldState }) => { return <Input {...field} type="number" variant="bordered" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} /> }}
                                 />
-                                <h1>Total Bayar</h1>
-                                <Input variant="bordered" disabled />
                                 <div className="flex justify-end gap-2">
                                     <Button color="danger" variant="ghost" onClick={closeModal}>
                                         Tutup
