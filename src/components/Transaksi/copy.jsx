@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardBody, Divider, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableRow, TableCell, TableBody, select, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Divider, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableRow, TableCell, TableBody } from "@nextui-org/react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -6,21 +6,20 @@ import { z, ZodError } from "zod";
 
 const transaksiFormSchema = z.object({
     customerId: z.string().min(4, "Nama Konsumen tidak boleh kosong"),
-    productId: z.string().nonempty("Peket Laundry tidak boleh kosong"),
+    productId: z.string().nonempty("Paket Laundry tidak boleh kosong"),
     Qty: z.coerce.number().min(1, "Qty tidak boleh kosong")
-})
+});
 
 import { useEffect, useState } from "react";
 import { axiosIntance } from "../../lib/axios";
 import { useSelector } from "react-redux";
 
 export default function ListTransactions() {
-
-    const token = useSelector(state => state.auth.token)
-    const [dataTranskasi, setDataTransaksi] = useState([])
-    const [dataCustomer, setDataCustomer] = useState([])
-    const [dataProduk, setDataProduk] = useState([])
-    const [openModal, setOpenModal] = useState(false)
+    const token = useSelector(state => state.auth.token);
+    const [dataTransaksi, setDataTransaksi] = useState([]);
+    const [dataCustomer, setDataCustomer] = useState([]);
+    const [dataProduk, setDataProduk] = useState([]);
+    const [openModal, setOpenModal] = useState(false);
 
     const formInput = useForm({
         defaultValues: {
@@ -29,85 +28,76 @@ export default function ListTransactions() {
             Qty: ""
         },
         resolver: zodResolver(transaksiFormSchema)
-    })
+    });
 
-    const getTransksi = async () => {
+    const getTransaksi = async () => {
         try {
-            const res = await axiosIntance.get("/bills", {
+            const response = await axiosIntance.get("/bills", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
-            })
+            });
 
-            const transactions = res.data.data;
+            const transactions = response.data.data;
 
-            const newCustomerdataTransaksion = [];
+            const newCustomerDataTransaction = [];
 
             transactions.forEach((transaction) => {
                 const customerId = transaction.customer.id;
-                let customer = newCustomerdataTransaksion.find(c => c.id === customerId);
+                let customer = newCustomerDataTransaction.find(c => c.id === customerId);
+
                 if (!customer) {
                     customer = {
                         ...transaction.customer,
                         transactions: [],
-                        transactionCount: 0
-                    }
-                    newCustomerdataTransaksion.push(customer)
+                        transactionCount: 0,
+                    };
+                    newCustomerDataTransaction.push(customer);
                 }
 
-                customer.transactions.push(transaction)
-                customer.transactionCount += 1
-            })
+                customer.transactions.push(transaction);
+                customer.transactionCount += 1;
+            });
 
-            console.log(newCustomerdataTransaksion)
-            if (res.data.status.code === 200) {
-                setDataTransaksi(newCustomerdataTransaksion);
-            }
+            setDataTransaksi(newCustomerDataTransaction);
+            console.log(newCustomerDataTransaction);
         } catch (error) {
             console.log(error.message);
-            toast.error("error")
+            toast.error("error");
         }
-    }
+    };
 
     const fetchCustomers = async () => {
         try {
-
-            // console.log(AuthCustomers)
-            const { data: customerData } = await axiosIntance.get(
-                `/customers`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            )
-            setDataCustomer(customerData.data)
+            const { data: customerData } = await axiosIntance.get("/customers", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setDataCustomer(customerData.data);
         } catch (error) {
-            console.log(error)
-            toast.error("error")
+            console.log(error);
+            toast.error("error");
         }
-    }
+    };
 
     const getProduk = async () => {
         try {
-            const res = await axiosIntance.get("/products/",
-                {
-                    headers:
-                        { Authorization: `Bearer ${token}` }
-                }
-            )
-            // console.log(res.data.data)
-            if (res.data.status.code == 200) {
-                setDataProduk(res.data.data)
+            const res = await axiosIntance.get("/products/", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.data.status.code === 200) {
+                setDataProduk(res.data.data);
             }
         } catch (error) {
             console.log(error.message);
-            toast.error("error")
+            toast.error("error");
         }
-    }
+    };
 
     const createTransaction = async (data) => {
         try {
-            console.log(data)
             const headers = {
                 Authorization: `Bearer ${token}`
-            }
+            };
             const payload = {
                 customerId: data.customerId,
                 billDetails: [
@@ -118,50 +108,37 @@ export default function ListTransactions() {
                         qty: data.Qty
                     }
                 ]
+            };
+            const res = await axiosIntance.post("/bills", payload, { headers });
+            if (res.status === 201) {
+                toast.success("Transaksi Berhasil!");
+                closeModal();
+                getTransaksi();
             }
-            const res = await axiosIntance.post("/bills", payload, { headers })
-            if (res.status == 201) {
-                toast.success("Transaksi Success!")
-                closeModal()
-                getTransksi()
-            }
-            console.log(res)
+            console.log(res);
         } catch (error) {
             console.log(error.message);
-            toast.error("error")
+            toast.error("error");
         }
-    }
+    };
 
     useEffect(() => {
-        getTransksi()
-        getProduk()
-        fetchCustomers()
-    }, [])
+        getTransaksi();
+        getProduk();
+        fetchCustomers();
+    }, []);
 
     useEffect(() => {
-        console.log(dataTranskasi)
-    }, [dataTranskasi])
+        console.log(dataTransaksi);
+    }, [dataTransaksi]);
 
     const openSubmit = () => {
-        setOpenModal(true)
-    }
+        setOpenModal(true);
+    };
 
     const closeModal = () => {
-        setOpenModal(false)
-    }
-
-
-    const onSubmit = (data) => {
-        try {
-            console.log(data)
-            toast.success("Transaksi Success!")
-        } catch (error) {
-            if (error instanceof ZodError) {
-                toast.error("Terjadi kesalahan. Mohon perikasa kembali formulir.")
-            }
-        }
-    }
-
+        setOpenModal(false);
+    };
 
     return (
         <div className="flex flex-col justify-center items-center">
@@ -180,24 +157,22 @@ export default function ListTransactions() {
                             <TableColumn>Label Transaksi</TableColumn>
                         </TableHeader>
                         <TableBody>
-                            {
-                                dataTranskasi.map((customer, index) => (
-                                    <TableRow key={index + 1} className="text-center">
-                                        <TableCell>{index + 1}</TableCell>
-                                        <TableCell>{customer.id}</TableCell>
-                                        <TableCell>
-                                            <h1>{customer.name}</h1>
-                                            <br />
-                                            <h1>{customer.transactionCount} transaksi</h1>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button>
-                                                Details
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            }
+                            {dataTransaksi.map((customer, index) => (
+                                <TableRow key={index + 1} className="text-center">
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{customer.id}</TableCell>
+                                    <TableCell>
+                                        <h1>{customer.name}</h1>
+                                        <br />
+                                        <h1>{customer.transactionCount} transaksi</h1>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button>
+                                            Details
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
                         </TableBody>
                     </Table>
                 </CardBody>
@@ -206,7 +181,7 @@ export default function ListTransactions() {
                 {openModal && (
                     <Card className="border-1 p-2 w-[300px] bg-slate-100">
                         <CardHeader className="font-semibold justify-between py-2">
-                            <h1>Daftar Transaksi</h1>
+                            <h1>Tambah Transaksi</h1>
                         </CardHeader>
                         <Divider />
                         <CardBody>
@@ -215,35 +190,37 @@ export default function ListTransactions() {
                                 <Controller
                                     name="customerId"
                                     control={formInput.control}
-                                    render={({ field, fieldState }) => {
-                                        return <Select {...field} variant="bordered" placeholder="Nama Customers" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} >
+                                    render={({ field, fieldState }) => (
+                                        <Select {...field} variant="bordered" placeholder="Nama Konsumen" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message}>
                                             {dataCustomer.map((customer) => (
-                                                <SelectItem variant="bordered" color="primary" className="bg-slate-100 text-center" key={customer.id}>
+                                                <SelectItem variant="bordered" color="primary" className="bg-slate-100 text-center" key={customer.id} value={customer.id}>
                                                     {customer.name}
                                                 </SelectItem>
                                             ))}
                                         </Select>
-                                    }}
+                                    )}
                                 />
-                                <h1>Pilih paket Laundry</h1>
+                                <h1>Pilih Paket Laundry</h1>
                                 <Controller
                                     name="productId"
                                     control={formInput.control}
-                                    render={({ field, fieldState }) => {
-                                        return <Select {...field} variant="bordered" placeholder="Paket Laundry" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} >
+                                    render={({ field, fieldState }) => (
+                                        <Select {...field} variant="bordered" placeholder="Paket Laundry" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message}>
                                             {dataProduk.map((produk) => (
-                                                <SelectItem variant="bordered" color="primary" className="bg-slate-100 text-center" key={produk.id}>
+                                                <SelectItem variant="bordered" color="primary" className="bg-slate-100 text-center" key={produk.id} value={produk.id}>
                                                     {produk.name}
                                                 </SelectItem>
                                             ))}
                                         </Select>
-                                    }}
+                                    )}
                                 />
-                                <h1>Qty(Kg)</h1>
+                                <h1>Qty (Kg)</h1>
                                 <Controller
                                     name="Qty"
                                     control={formInput.control}
-                                    render={({ field, fieldState }) => { return <Input {...field} type="number" variant="bordered" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} /> }}
+                                    render={({ field, fieldState }) => (
+                                        <Input {...field} type="number" variant="bordered" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} />
+                                    )}
                                 />
                                 <div className="flex justify-end gap-2">
                                     <Button color="danger" variant="ghost" onClick={closeModal}>
@@ -259,5 +236,5 @@ export default function ListTransactions() {
                 )}
             </div>
         </div>
-    )
+    );
 }
