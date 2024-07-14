@@ -1,8 +1,9 @@
-import { Card, CardHeader, CardBody, Divider, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableRow, TableCell, TableBody, select, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Divider, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableRow, TableCell, TableBody, select, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal } from "@nextui-org/react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { z, ZodError } from "zod";
+import { z } from "zod";
+import { FiCreditCard, FiEdit, FiList } from "react-icons/fi";
 
 const transaksiFormSchema = z.object({
     customerId: z.string().min(4, "Nama Konsumen tidak boleh kosong"),
@@ -13,6 +14,7 @@ const transaksiFormSchema = z.object({
 import { useEffect, useState } from "react";
 import { axiosIntance } from "../../lib/axios";
 import { useSelector } from "react-redux";
+import RiwayatTransactions from "./RiwayatTransaksi";
 
 export default function ListTransactions() {
 
@@ -21,6 +23,8 @@ export default function ListTransactions() {
     const [dataCustomer, setDataCustomer] = useState([])
     const [dataProduk, setDataProduk] = useState([])
     const [openModal, setOpenModal] = useState(false)
+    const [modalDetails, setModalDetails] = useState(false)
+    const [selectedDetails, setSelectedDetails] = useState(null)
 
     const formInput = useForm({
         defaultValues: {
@@ -150,25 +154,18 @@ export default function ListTransactions() {
         setOpenModal(false)
     }
 
-
-    const onSubmit = (data) => {
-        try {
-            console.log(data)
-            toast.success("Transaksi Success!")
-        } catch (error) {
-            if (error instanceof ZodError) {
-                toast.error("Terjadi kesalahan. Mohon perikasa kembali formulir.")
-            }
-        }
+    const toggleDetails = (customer) => {
+        // setSelectedDetails([transaksi])
+        console.log(customer)
+        setModalDetails(true)
     }
-
 
     return (
         <div className="flex flex-col justify-center items-center">
-            <Card className="w-[900px] mt-8">
+            <Card className="w-[900px]">
                 <CardHeader className="font-semibold justify-between p-2">
                     <h1>Daftar Transaksi</h1>
-                    <Button color="primary" onClick={openSubmit}>Tambah Transaksi</Button>
+                    <Button color="primary" variant="shadow" onClick={openSubmit}>Tambah Transaksi <FiCreditCard /></Button>
                 </CardHeader>
                 <Divider />
                 <CardBody>
@@ -191,8 +188,8 @@ export default function ListTransactions() {
                                             <h1>{customer.transactionCount} transaksi</h1>
                                         </TableCell>
                                         <TableCell>
-                                            <Button>
-                                                Details
+                                            <Button color="success" variant="bordered" onClick={() => toggleDetails(customer)}>
+                                                Details <FiList />
                                             </Button>
                                         </TableCell>
                                     </TableRow>
@@ -204,7 +201,7 @@ export default function ListTransactions() {
             </Card>
             <div className="flex justify-center items-center">
                 {openModal && (
-                    <Card className="border-1 p-2 w-[300px] bg-slate-100">
+                    <Card className="border-1 p-2 w-[300px] bg-slate-300">
                         <CardHeader className="font-semibold justify-between py-2">
                             <h1>Daftar Transaksi</h1>
                         </CardHeader>
@@ -257,6 +254,11 @@ export default function ListTransactions() {
                         </CardBody>
                     </Card>
                 )}
+                <Modal isOpen={modalDetails}
+                    onOpenChange={() => setModalDetails(false)}
+                    onClose={() => setModalDetails(false)}>
+                    <RiwayatTransactions details={selectedDetails} onClose={() => setModalDetails(false)} />
+                </Modal>
             </div>
         </div>
     )

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { Controller, useForm } from "react-hook-form";
 import EditCustomers from "./EditCustomers";
+import { FiEdit, FiPlusSquare, FiTrash2 } from "react-icons/fi";
 
 
 export default function Customers({ value, }) {
@@ -158,11 +159,11 @@ export default function Customers({ value, }) {
                 )}
                 <div className="flex gap-[41rem]">
                     <h1>List Customer</h1>
-                    <Button onClick={toggleCreate} color="primary" variant="bordered">Create</Button>
+                    <Button onClick={toggleCreate} color="primary" variant="shadow">Create<FiPlusSquare /></Button>
                 </div>
 
                 <Table
-                    className="text-center table-fixed w-[64rem]"
+                    className="text-center w-[64rem]"
                     aria-label="Customers Table">
                     <TableHeader>
                         <TableColumn>NAME</TableColumn>
@@ -179,8 +180,8 @@ export default function Customers({ value, }) {
                                     <TableCell>{customers.address}</TableCell>
                                     <TableCell>
                                         <div className="gap-4">
-                                            <Button onClick={() => handleUpdate(customers)} color="warning" variant="ghost">Edit</Button>
-                                            <Button onClick={() => handleDelete(customers.id)} color="danger" variant="ghost">Delete</Button>
+                                            <Button onClick={() => handleUpdate(customers)} color="warning" variant="ghost">Edit <FiEdit /> </Button>
+                                            <Button onClick={() => handleDelete(customers.id)} color="danger" variant="ghost">Delete<FiTrash2 /></Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -190,8 +191,7 @@ export default function Customers({ value, }) {
                 </Table>
                 <Modal isOpen={modalUpdate}
                     onOpenChange={() => setModalUpdate(false)}
-                    onClose={() => setModalUpdate(false)}
-                >
+                    onClose={() => setModalUpdate(false)}>
                     <EditCustomers customer={selectedCustomer} handleFetchData={fetchCustomers} />
                 </Modal>
             </div>

@@ -1,5 +1,5 @@
-import { Card, CardBody, CardFooter, ModalContent, Input, Button, ModalBody, ModalFooter } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { ModalContent, Input, Button, ModalBody, ModalFooter } from "@nextui-org/react";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { axiosIntance } from "../../lib/axios";

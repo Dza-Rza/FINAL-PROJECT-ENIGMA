@@ -1,29 +1,54 @@
-import { Card, CardHeader, CardBody, Divider, Button } from "@nextui-org/react";
-import { Link } from "react-router-dom";
+import { Divider, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, ModalContent, ModalBody } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 
-export default function RiwayatTransactions() {
+export default function RiwayatTransactions({ details }) {
+
+    const [riwayatData, setRiwayatData] = useState([])
+
+    useEffect(() => {
+        if (details) {
+            formatData = details.map((transaction) => ({
+                kodeTransaksi: transaction.id,
+                tanggalTransaksi: new Date(transaction.createdAt).toLocaleString(),
+                qty: transaction.billDetails.map((detail) => detail.qty),
+                paket: transaction.billDetails.map((detail) => detail.product.name),
+                totalHarga: transaction.billDetails.map((sum, detail) => sum + (detail.qty * detail.product.price), 0)
+            }))
+            setRiwayatData(formatData)
+        }
+    }, [details])
+
     return (
-        <div className="flex h-[128px] justify-center items-center">
-            <Card className="w-[900px]">
-                <CardHeader className="font-semibold justify-between">
-                    <h1>Riwayat Transaksi</h1>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                    <div className="text-center font-sans flex justify-between">
-                        <h1>Kode Pelanggan</h1>
-                        <h1>Tanggal Transaksi</h1>
-                        <h1>Paket Laundry</h1>
-                        <h1>Qty</h1>
-                        <h1>Total Bayar</h1>
-                    </div>
-                    <div className="flex justify-end">
-                        <Button color="warning" variant="bordered">
-                            <Link to="/">Close</Link>
-                        </Button>
-                    </div>
-                </CardBody>
-            </Card>
-        </div>
+        <ModalContent className="w-[500px]">
+            {(onClose) => (
+                <>
+                    <ModalBody className="text-center">
+                        <h1>Riwayat Transaksi</h1>
+                        <Divider />
+                        <Table aria-label="Riwayat Transaksi" className="text-center">
+                            <TableHeader>
+                                <TableColumn>Kode Transaksi</TableColumn>
+                                <TableColumn>Tanggal Transaksi</TableColumn>
+                                <TableColumn>Qty</TableColumn>
+                                <TableColumn>Paket</TableColumn>
+                                <TableColumn>Total Harga</TableColumn>
+                            </TableHeader>
+                            <TableBody>
+                                {riwayatData.map((transaction, index) => (
+                                    <TableRow key={index + 1}>
+                                        <TableCell>{transaction.kodeTransaksi}</TableCell>
+                                        <TableCell>{transaction.tanggalTransaksi}</TableCell>
+                                        <TableCell>{transaction.qty}</TableCell>
+                                        <TableCell>{transaction.paket}</TableCell>
+                                        <TableCell>{transaction.totalHarga}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <Button color="primary" variant="ghost" onClick={onClose}>Close</Button>
+                    </ModalBody>
+                </>
+            )}
+        </ModalContent>
     )
 }

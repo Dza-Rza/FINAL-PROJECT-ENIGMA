@@ -2,6 +2,7 @@ import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Divider, Button } from 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, Outlet, useNavigate } from "react-router-dom";
+import { FiLogOut } from "react-icons/fi";
 
 export default function Header() {
 
@@ -21,7 +22,7 @@ export default function Header() {
 
     return (
         <>
-            <Navbar className="flex justify-center cursor-pointer px-[24px] bg-slate-900 text-background backdrop-blur-xl">
+            <Navbar className="flex justify-center px-[24px] bg-slate-900 text-background backdrop-blur-xl">
                 <NavbarBrand className="font-bold">
                     <h1>Logo</h1>
                 </NavbarBrand>
@@ -56,7 +57,7 @@ export default function Header() {
                         {
                             selector.token ?
                                 <Button color="primary" variant="ghost" onClick={HandleLogOut}>
-                                    Log Out
+                                    Log Out <FiLogOut />
                                 </Button>
                                 : <Button >
                                     Login

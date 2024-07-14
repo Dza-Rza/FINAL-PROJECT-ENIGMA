@@ -4,6 +4,7 @@ import { axiosIntance } from "../../lib/axios";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import EditProduk from "./EditProduk";
+import { FiEdit, FiFolderPlus, FiPlus, FiPlusSquare, FiTrash2 } from "react-icons/fi";
 
 export default function Produk() {
 
@@ -98,7 +99,7 @@ export default function Produk() {
 
     return (
         <>
-            <div className="flex mt-8 p-4 flex-col items-center justify-center">
+            <div className="flex p-4 flex-col items-center justify-center">
                 {create && (
                     <div className="h-screen fixed w-[85%] bg-mute z-20">
                         <div className="flex justify-center items-center h-full">
@@ -127,7 +128,7 @@ export default function Produk() {
                 )}
                 <div className="flex gap-[41rem]">
                     <h1>List Produk</h1>
-                    <Button onClick={addProduk} color="primary" variant="bordered">Create</Button>
+                    <Button onClick={addProduk} color="primary" variant="shadow">Create<FiPlus /></Button>
                 </div>
                 <Table
                     className="text-center w-[64rem]"
@@ -148,8 +149,8 @@ export default function Produk() {
                                     <TableCell>{data.price}</TableCell>
                                     <TableCell>{data.type}</TableCell>
                                     <TableCell>
-                                        <Button color="primary" variant="bordered" onClick={() => openModalUpdate(data)}>edit</Button>
-                                        <Button color="warning" variant="bordered" onClick={() => deleteProduk(data.id)}>hapus</Button>
+                                        <Button color="warning" variant="bordered" onClick={() => openModalUpdate(data)}>Edit<FiEdit /></Button>
+                                        <Button color="danger" variant="bordered" onClick={() => deleteProduk(data.id)}>hapus<FiTrash2 /></Button>
                                     </TableCell>
                                 </TableRow>)
                         })}

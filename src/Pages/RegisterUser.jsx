@@ -99,7 +99,7 @@ export default function Register() {
 
     return (
         <div className="flex h-screen items-center justify-center">
-            <Card className="border-1 gap-2 p-2">
+            <Card className="border-1 gap-2 p-2 bg-blue-400">
                 <CardHeader className=" justify-center font-semibold text-lg ">
                     <h1>Sign Up</h1>
                 </CardHeader>
@@ -134,7 +134,7 @@ export default function Register() {
                                 return <Input {...field} type="password" label="Password" size="sm" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} />
                             }}
                         />
-                        <p className="gap-4">Already Have An Account <Link to="/Login" >Login</Link> </p>
+                        <p className="gap-4">Already Have An Account <Link to="/Login" className="text-blue-700" >Login</Link> </p>
                         <Button type="submit" color="primary">Register</Button>
                     </form>
                 </CardBody>

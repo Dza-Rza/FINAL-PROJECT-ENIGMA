@@ -59,7 +59,7 @@ export default function LoginUser() {
 
     return (
         <div className="flex h-screen items-center justify-center">
-            <Card className="border-1 gap-2 p-2">
+            <Card className="border-1 gap-2 p-2 bg-blue-400">
                 <CardHeader className=" justify-center font-semibold text-lg ">
                     <h1>Login</h1>
                 </CardHeader>
@@ -80,7 +80,7 @@ export default function LoginUser() {
                                 return <Input {...field} type="password" label="Password" size="sm" isInvalid={Boolean(fieldState.error)} errorMessage={fieldState.error?.message} />
                             }}
                         />
-                        <p>Don't Have Account <Link to="/register-user"color="primary" >Register</Link></p>
+                        <p>Don't Have Account <Link to="/register-user" className="text-blue-700 " >Register</Link></p>
                         <Button type="submit" color="primary">Register</Button>
                     </form>
                 </CardBody>
