@@ -24,7 +24,7 @@ export default function ListTransactions() {
     const [dataProduk, setDataProduk] = useState([])
     const [openModal, setOpenModal] = useState(false)
     const [modalDetails, setModalDetails] = useState(false)
-    const [selectedDetails, setSelectedDetails] = useState(null)
+    const [detailsTransactions, setDetailsTransactions] = useState()
 
     const formInput = useForm({
         defaultValues: {
@@ -43,29 +43,9 @@ export default function ListTransactions() {
                 }
             })
 
-            const transactions = res.data.data;
-
-            const newCustomerdataTransaksion = [];
-
-            transactions.forEach((transaction) => {
-                const customerId = transaction.customer.id;
-                let customer = newCustomerdataTransaksion.find(c => c.id === customerId);
-                if (!customer) {
-                    customer = {
-                        ...transaction.customer,
-                        transactions: [],
-                        transactionCount: 0
-                    }
-                    newCustomerdataTransaksion.push(customer)
-                }
-
-                customer.transactions.push(transaction)
-                customer.transactionCount += 1
-            })
-
-            console.log(newCustomerdataTransaksion)
-            if (res.data.status.code === 200) {
-                setDataTransaksi(newCustomerdataTransaksion);
+            if (res.data.status.code == 200) {
+                console.log(res.data.data)
+                setDataTransaksi(res.data.data)
             }
         } catch (error) {
             console.log(error.message);
@@ -154,11 +134,24 @@ export default function ListTransactions() {
         setOpenModal(false)
     }
 
-    const toggleDetails = (customer) => {
-        // setSelectedDetails([transaksi])
-        console.log(customer)
-        setModalDetails(true)
+    const getDetailsTransaction = async (id) => {
+        try {
+            setModalDetails(true)
+            const res = await axiosIntance.get(`/bills/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            if (res.data.status.code == 200) {
+                // console.log(res.data.data)
+                setDetailsTransactions(res.data.data.billDetails[0])
+            }
+        } catch (error) {
+            console.log(error.message);
+            toast.error("error")
+        }
     }
+
 
     return (
         <div className="flex flex-col justify-center items-center">
@@ -178,17 +171,17 @@ export default function ListTransactions() {
                         </TableHeader>
                         <TableBody>
                             {
-                                dataTranskasi.map((customer, index) => (
+                                dataTranskasi.map((transactions, index) => (
                                     <TableRow key={index + 1} className="text-center">
                                         <TableCell>{index + 1}</TableCell>
-                                        <TableCell>{customer.id}</TableCell>
+                                        <TableCell>{transactions.id}</TableCell>
                                         <TableCell>
-                                            <h1>{customer.name}</h1>
-                                            <br />
-                                            <h1>{customer.transactionCount} transaksi</h1>
+                                            <h1>{transactions.customer?.name}</h1>
+                                            {/* <br />
+                                            <h1>{transactions.transactionCount} transaksi</h1> */}
                                         </TableCell>
                                         <TableCell>
-                                            <Button color="success" variant="bordered" onClick={() => toggleDetails(customer)}>
+                                            <Button color="success" variant="bordered" onClick={() => getDetailsTransaction(customer.id)}>
                                                 Details <FiList />
                                             </Button>
                                         </TableCell>
@@ -257,7 +250,7 @@ export default function ListTransactions() {
                 <Modal isOpen={modalDetails}
                     onOpenChange={() => setModalDetails(false)}
                     onClose={() => setModalDetails(false)}>
-                    <RiwayatTransactions details={selectedDetails} onClose={() => setModalDetails(false)} />
+                    <RiwayatTransactions transDetails={detailsTransactions} onClose={() => setModalDetails(false)} />
                 </Modal>
             </div>
         </div>

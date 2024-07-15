@@ -8,6 +8,7 @@ import CheckAuth from "./hoc/CheckAuth"
 import LoginUser from "./Pages/Login"
 import Produk from "./components/Produk/Produk"
 import Customers from "./components/customers/Customers"
+import NotFound from "./components/NotFound"
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <Route element={<RiwayatTransactions />} path="/riwayat-transaksi" />
             <Route element={<Produk />} path="/products" />
             <Route element={<Customers />} path="/customers" />
+            <Route element={<NotFound />} path="*" />
           </Route>
         </Route>
         <Route element={<RegisterUser />} path="/register-user" />

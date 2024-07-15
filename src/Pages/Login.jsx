@@ -49,7 +49,7 @@ export default function LoginUser() {
                             userInfo: userInfo
                         }
                     });
-                    navigate("/")
+                    navigate("/customers")
                 }, 500)
             }
         } catch (error) {
@@ -58,7 +58,7 @@ export default function LoginUser() {
     }
 
     return (
-        <div className="flex h-screen items-center justify-center">
+        <div className="flex h-screen items-center justify-center ">
             <Card className="border-1 gap-2 p-2 bg-blue-400">
                 <CardHeader className=" justify-center font-semibold text-lg ">
                     <h1>Login</h1>

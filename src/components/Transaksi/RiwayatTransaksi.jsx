@@ -1,22 +1,16 @@
-import { Divider, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, ModalContent, ModalBody } from "@nextui-org/react";
+import { Divider, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, ModalContent, ModalBody, Chip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 
-export default function RiwayatTransactions({ details }) {
+export default function RiwayatTransactions({ transDetails }) {
 
-    const [riwayatData, setRiwayatData] = useState([])
+    const [detailsTransaksi, setDetailsTransaksi] = useState()
 
     useEffect(() => {
-        if (details) {
-            formatData = details.map((transaction) => ({
-                kodeTransaksi: transaction.id,
-                tanggalTransaksi: new Date(transaction.createdAt).toLocaleString(),
-                qty: transaction.billDetails.map((detail) => detail.qty),
-                paket: transaction.billDetails.map((detail) => detail.product.name),
-                totalHarga: transaction.billDetails.map((sum, detail) => sum + (detail.qty * detail.product.price), 0)
-            }))
-            setRiwayatData(formatData)
+        if (transDetails) {
+            console.log(transDetails)
+            setDetailsTransaksi(transDetails)
         }
-    }, [details])
+    }, [transDetails])
 
     return (
         <ModalContent className="w-[500px]">
@@ -34,15 +28,25 @@ export default function RiwayatTransactions({ details }) {
                                 <TableColumn>Total Harga</TableColumn>
                             </TableHeader>
                             <TableBody>
-                                {riwayatData.map((transaction, index) => (
-                                    <TableRow key={index + 1}>
-                                        <TableCell>{transaction.kodeTransaksi}</TableCell>
-                                        <TableCell>{transaction.tanggalTransaksi}</TableCell>
-                                        <TableCell>{transaction.qty}</TableCell>
-                                        <TableCell>{transaction.paket}</TableCell>
-                                        <TableCell>{transaction.totalHarga}</TableCell>
-                                    </TableRow>
-                                ))}
+                                <TableRow>
+                                    <TableCell>
+                                        <Chip color="success" variant="bordered">
+                                            {detailsTransaksi?.id.substring(0, 8)}
+                                        </Chip>
+                                    </TableCell>
+                                    <TableCell>
+                                        {new Date(detailsTransaksi?.createdAt).toLocaleDateString(
+                                            'id-ID', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        }
+                                        )}
+                                    </TableCell>
+                                    <TableCell>{detailsTransaksi?.qty}</TableCell>
+                                    <TableCell>{detailsTransaksi?.product.name}</TableCell>
+                                    <TableCell>{(detailsTransaksi?.price * detailsTransaksi?.qty).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</TableCell>
+                                </TableRow>
                             </TableBody>
                         </Table>
                         <Button color="primary" variant="ghost" onClick={onClose}>Close</Button>
