@@ -181,7 +181,7 @@ export default function ListTransactions() {
                                             <h1>{transactions.transactionCount} transaksi</h1> */}
                                         </TableCell>
                                         <TableCell>
-                                            <Button color="success" variant="bordered" onClick={() => getDetailsTransaction(customer.id)}>
+                                            <Button color="success" variant="bordered" onClick={() => getDetailsTransaction(transactions.id)}>
                                                 Details <FiList />
                                             </Button>
                                         </TableCell>

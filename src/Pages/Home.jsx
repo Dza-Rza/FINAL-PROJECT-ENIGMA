@@ -43,7 +43,7 @@ export default function Header() {
                         </Link>
                     </NavbarItem>
                     {
-                        selector.userInfo.role == "admin" ?
+                        selector.userInfo == "admin" ?
                             < NavbarItem >
                                 <Link to="/list-transaksi">
                                     User Manajement
